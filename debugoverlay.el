@@ -85,7 +85,8 @@
        (cl-loop for (filename line-number message buffer) in buffer-matches
 		do (with-current-buffer buffer
 		     (save-excursion
-		       (goto-line (+ 1 line-number))
+		       (goto-char (point-min))
+		       (forward-line line-number)
 		       (let* ((here (-  (point) 1))
 			      (overlay-key (cons filename line-number))
 			      (old-overlay (cdr (assoc overlay-key debugoverlay-overlays)))
