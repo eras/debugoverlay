@@ -78,7 +78,8 @@
 						    (message (nth 3 match))
 						    (buffer (get-file-buffer filename)))
 					       (list filename line-number message buffer)
-					       ))))
+					       )))
+	    (count 1))
 
        (debugoverlay-delete-overlays)
 
@@ -86,34 +87,61 @@
 		do (with-current-buffer buffer
 		     (save-excursion
 		       (goto-char (point-min))
-		       (forward-line line-number)
-		       (let* ((here (-  (point) 1))
+		       (forward-line (1- line-number))
+		       (let* ((bol (point))
+			      (eol (progn (forward-line 1) (1- (point))))
+			      (col (progn (forward-char -1) (current-column)))
 			      (overlay-key (cons filename line-number))
 			      (old-overlay (cdr (assoc overlay-key debugoverlay-overlays)))
 			      (overlay (if old-overlay
 					   old-overlay
-					 (make-overlay here here)))
+					 (let ((new-overlay (make-overlay bol eol nil nil)))
+					   (overlay-put new-overlay 'evaporate t)
+					   new-overlay)))
 			      (old-overlay-text (if old-overlay
-						    (overlay-get old-overlay 'before-string)
+						    (overlay-get old-overlay 'after-string)
 						  " // "
 						  ))
-			      (new-overlay-text (concat old-overlay-text (if old-overlay "; ") message))
+			      (new-overlay-text (propertize (concat old-overlay-text
+								    (if old-overlay
+									(concat "\n" (make-string col ?\s) " // "))
+								    (format "[%d] %s" count message))
+							    'face 'debugoverlay-comment))
 			      )
 			 (if (not old-overlay)
 			     (setq debugoverlay-overlays (cons (cons overlay-key overlay) debugoverlay-overlays)))
-			 (put-text-property 0 (length new-overlay-text) 'face 'debugoverlay-comment new-overlay-text)
-			 (overlay-put overlay 'before-string new-overlay-text)
+			 (overlay-put overlay 'after-string new-overlay-text)
+			 (cl-incf count)
 			 )
 		       )
 		     )
 		)
        ))))
 
+(defun debugoverlay-insert-template ()
+  (interactive)
+  (insert "
+#define D(VAR)                                                                                       \\
+    [&]() {                                                                                          \\
+        _Pragma(\"GCC diagnostic push\");                                                              \\
+        _Pragma(\"GCC diagnostic ignored \\\"-Wshadow\\\"\");                                              \\
+        auto _debug_var = (VAR);                                                                     \\
+        std::cout << __FILE__ << \":\" << __LINE__ << \": \" << #VAR << \"==\" << _debug_var << std::endl; \\
+        _Pragma(\"GCC diagnostic pop\");                                                               \\
+        return _debug_var;                                                                           \\
+    }()
+
+#define E(VAR) (VAR)
+
+#define HERE std::cout << __FILE__ << \":\" << __LINE__ << \": here\" << std::endl
+"))
+
 (defun debugoverlay--finish-functions-hook (buffer status-string)
   (debugoverlay-make-overlays)
   )
 
 (defun debugoverlay-hook (&optional append local)
+  "Arranges debugoverlay-make-overlays be called after compile finishes."
   (interactive)
   (add-hook 'compilation-finish-functions 'debugoverlay--finish-functions-hook append local)
   )
