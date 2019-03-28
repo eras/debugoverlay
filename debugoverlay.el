@@ -13,7 +13,7 @@
   :group 'debugoverlay)
 
 (defcustom debugoverlay-default-regexp
-  "^\\(/.*\\):\\([0-9][0-9]*\\): *\\(.*\\)"
+  "^\\(/[^:]*\\):\\([0-9][0-9]*\\): *\\(.*\\)"
   "Default regular expression for 'debugoverlay-make-overlays'"
   :group 'debugoverlay
   :type 'regexp
