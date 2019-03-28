@@ -105,7 +105,9 @@
 			      (new-overlay-text (propertize (concat old-overlay-text
 								    (if old-overlay
 									(concat "\n" (make-string col ?\s) " // "))
-								    (format "[%d] %s" count message))
+								    (format "[% 3d] %s"
+									    count
+									    message))
 							    'face 'debugoverlay-comment))
 			      )
 			 (if (not old-overlay)
