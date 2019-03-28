@@ -135,7 +135,9 @@
 
 #define E(VAR) (VAR)
 
-#define HERE std::cout << __FILE__ << \":\" << __LINE__ << \": here\" << std::endl
+#define D_HERE std::cout << __FILE__ << \":\" << __LINE__ << \": here\" << std::endl
+#define D_GROUP() std::cout << __FILE__ << \":\" << __LINE__ << \": GROUP\" << std::endl
+#define D_GROUP_END() std::cout << __FILE__ << \":\" << __LINE__ << \": GROUP_END\" << std::endl
 "))
 
 (defun debugoverlay--finish-functions-hook (buffer status-string)
