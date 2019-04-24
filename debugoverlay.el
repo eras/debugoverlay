@@ -152,4 +152,27 @@
   (add-hook 'compilation-finish-functions 'debugoverlay--finish-functions-hook append local)
   )
 
+(defun debugoverlay-hereify-region ()
+  "Replaces { within a region with {D_HERE;"
+  (interactive)
+  (let ((do-replace (lambda () (replace-regexp "{$" "{D_HERE;" nil (region-beginning) (region-end)))))
+    (if (not (use-region-p))
+	(save-mark-and-excursion
+	 (c-mark-function)
+	 (funcall do-replace))
+      (save-excursion
+	(funcall do-replace))))
+  )
+
+(defun debugoverlay-unhereify-region ()
+  "Replaces {D_HERE; within a region with {"
+  (interactive)
+  (let ((do-replace (lambda () (replace-regexp "{D_HERE;" "{" nil (region-beginning) (region-end)))))
+    (if (not (use-region-p))
+	(save-mark-and-excursion
+	 (c-mark-function)
+	 (funcall do-replace))
+      (save-excursion
+	(funcall do-replace)))))
+
 (provide 'debugoverlay)
