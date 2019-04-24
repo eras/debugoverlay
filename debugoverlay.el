@@ -70,7 +70,6 @@
        (buffer-list))
     (`(,compilation)
      (let* ((matches (debugoverlay--matches-in-buffer compilation debugoverlay-default-regexp))
-	    (buffers (debugoverlay--make-buffer-file-assoc))
 	    (buffer-matches (cl-loop for (begin end match) in matches
 				     if (get-file-buffer (nth 1 match))
 				     collect (let* ((filename (nth 1 match))
