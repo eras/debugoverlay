@@ -122,6 +122,8 @@
 (defun debugoverlay-insert-template ()
   (interactive)
   (insert "
+#if !defined(DEBUGOVERLAY_DEFINES)
+#define DEBUGOVERLAY_DEFINES 1
 #define D(VAR)                                                                                       \\
     [&]() {                                                                                          \\
         _Pragma(\"GCC diagnostic push\");                                                              \\
@@ -137,6 +139,7 @@
 #define D_HERE std::cout << __FILE__ << \":\" << __LINE__ << \": here\" << std::endl
 #define D_GROUP() std::cout << __FILE__ << \":\" << __LINE__ << \": GROUP\" << std::endl
 #define D_GROUP_END() std::cout << __FILE__ << \":\" << __LINE__ << \": GROUP_END\" << std::endl
+#endif // !defined(DEBUGOVERLAY_DEFINES)
 "))
 
 (defun debugoverlay--finish-functions-hook (buffer status-string)
