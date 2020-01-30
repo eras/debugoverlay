@@ -152,6 +152,12 @@
   (add-hook 'compilation-finish-functions 'debugoverlay--finish-functions-hook append local)
   )
 
+(defun debugoverlay-unhook (&optional append local)
+  "Undoes debugoverlay-hook"
+  (interactive)
+  (remove-hook 'compilation-finish-functions 'debugoverlay--finish-functions-hook)
+  )
+
 (defun debugoverlay-hereify-region ()
   "Replaces { within a region with {D_HERE;"
   (interactive)
